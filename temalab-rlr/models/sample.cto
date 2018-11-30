@@ -1,0 +1,98 @@
+namespace hu.bme.mit.temalab
+
+participant Intersection identified by intersectionId {
+  o String intersectionId
+  --> EntryPoint[] entryPoints
+}
+
+participant InsuranceCompany identified by insuranceCompanyId {
+  o String insuranceCompanyId
+  o String name
+}
+
+participant Vehicle identified by vehicleId {
+  o String vehicleId
+}
+
+participant Police identified by policeId {
+  o String policeId
+}
+
+participant TrafficAuthority identified by trafficAuthorityId {
+  o String trafficAuthorityId
+}
+
+/* TOKENS */
+
+asset PreemptionUtilityToken identified by tokenId {
+  o String tokenId
+}
+
+/* When a request is taken into account, the Intersection burns the token(s). This destroys the token. */
+transaction Burn {
+  --> Vehicle vehicle
+  --> PreemptionUtilityToken[] tokens
+}
+
+/* Create a given amount of tokens belonging to a Vehicle. This should be available only for TrafficAuthority (in ACL). */
+transaction Issue {
+  --> Vehicle vehicle
+  o Integer amount
+}
+
+asset RLRevent identified by RLReventId{
+  o String RLReventId
+  o String lastSignalChangeId
+  o String pictureHash
+  o String evidence optional
+  o String vehicleId optional
+  o Boolean invalid
+  --> EntryPoint entry
+  --> Intersection intersection
+}
+
+abstract asset Preempt {
+  --> EntryPoint entryPoint
+}
+
+asset GreenExtensionRequestEvent identified by GreenExtensionRequestEventId extends Preempt {
+	o String GreenExtensionRequestEventId
+}
+
+asset PreemptionRequestEvent identified by PreemptionRequestEventId extends Preempt {
+	o String PreemptionRequestEventId
+}
+
+asset SignalChangeEvent identified by SignalChangeEventId {
+  o String SignalChangeEventId
+  --> EntryPoint entryPoint
+  --> SignalChangeEvent lastSignalChange
+}
+
+asset EntryPoint identified by entryPointId{
+  o String entryPointId
+}
+
+/*TrafficAuthority can update Intersection infrastructure*/
+transaction updateEntryPoints {
+  --> Intersection intersection
+  --> EntryPoint[] newPoints			//Replaces old EntryPoint[] array with new instances
+
+}
+
+/*Police can update VehicleID in the RLREvent*/
+transaction updateVehicleID {
+  o String eventId
+  o String vehicleID
+}
+
+/*Police can invalidate an RLREvent*/
+transaction invalidateRLREvent {
+  o String eventId
+}
+
+/*Vehicles(owners) can contest RLREvents*/
+transaction contestRLREvent {
+  o String eventId
+  o String evidence
+}
