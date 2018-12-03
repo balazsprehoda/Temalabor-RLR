@@ -58,12 +58,6 @@ transaction Issue {
   o Integer amount
 }
 
-/* Create a given amount of Tokens and add them to a specified Vehicle. This should be available only for TrafficAuthority (in ACL). Serves to compensate wrong burn transactions. Semantically differs from Issue. */
-transaction Compensate {
-  --> Vehicle vehicle
-  o Integer amount
-}
-
 //////////////////////////////////////////////////////////////////
 
 
