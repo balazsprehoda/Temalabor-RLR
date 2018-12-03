@@ -21,13 +21,15 @@ async function issue(tx) {
     let tokenId;
     let j = 0;
     while(tokenId == null) {
-      if (tokenIds.indexOf("token"+j) < 0) {
-        tokenId = "token"+j;
+      if (tokenIds.indexOf("tkn"+j) < 0) {
+        tokenId = "tkn"+j;
         tokenIds.push(tokenId);
       }
       j++;
     }
-    let token = factory.newResource('hu.bme.mit.temalab', 'PreemptionUtilityToken', tokenId);
+    let token = await factory.newResource('hu.bme.mit.temalab', 'PreemptionUtilityToken', tokenId);
+    token.owner = tx.vehicle;
+    token.latestUpdateTime = new Date();
     await getAssetRegistry('hu.bme.mit.temalab.PreemptionUtilityToken')
       .then(function(tokenRegistry) {
       return tokenRegistry.add(token);
@@ -35,7 +37,7 @@ async function issue(tx) {
     tx.vehicle.tokens.push(token);
   }
   
-  vehicleRegistry.update(tx.vehicle);
+  await vehicleRegistry.update(tx.vehicle);
 }
 
 /**
@@ -48,47 +50,63 @@ async function burn(tx) {
   let tokenRegistry = await getAssetRegistry('hu.bme.mit.temalab.PreemptionUtilityToken');
   await tx.tokens.forEach(function (token) {
     tx.vehicle.tokens.splice(tx.vehicle.tokens.indexOf(token), 1);
+    token.isValid = false;
+    token.trafficAuthoritySignature = false;
+    token.latestUpdateTime = new Date();
   });
-  await tokenRegistry.removeAll(tx.tokens);
-  await vehicleRegistry.update(tx.vehicle);
+   await tokenRegistry.updateAll(tx.tokens);
+   await vehicleRegistry.update(tx.vehicle);
 }
 
 /**
- * Compensate transaction processor function.
- * @param {hu.bme.mit.temalab.Compensate} tx The Compensate transaction instance.
+ * UnBurn transaction processor function.
+ * @param {hu.bme.mit.temalab.UnBurn} tx The UnBurn transaction instance.
  * @transaction
  */
-async function compensate(tx) {
-  let factory = getFactory();
+async function unBurn(tx) {
   let vehicleRegistry = await getParticipantRegistry('hu.bme.mit.temalab.Vehicle');
-  
-  const tokenRegistry = await getAssetRegistry('hu.bme.mit.temalab.PreemptionUtilityToken');   
-    let existingTokens = await tokenRegistry.getAll();
-  
-    let numberOfTokens = 0;
-  	let tokenIds = new Array();
-    await existingTokens .forEach(function (token) {
-      numberOfTokens ++;
-      tokenIds.push(token.tokenId);
-    });
-
-  for (let i = 0; i < tx.amount; i++) {
-    let tokenId;
-    let j = 0;
-    while(tokenId == null) {
-      if (tokenIds.indexOf("token"+j) < 0) {
-        tokenId = "token"+j;
-        tokenIds.push(tokenId);
-      }
-      j++;
+  let tokenRegistry = await getAssetRegistry('hu.bme.mit.temalab.PreemptionUtilityToken');
+  let vehicles = new Array();
+  await tx.tokens.forEach(function (token) {
+    if(token.trafficAuthoritySignature && token.owner.tokens.indexOf(token) < 0) {
+      token.owner.tokens.push(token);
+      token.isValid = true;
+      token.latestUpdateTime = new Date();
+      vehicleRegistry.update(token.owner);
     }
-    let token = factory.newResource('hu.bme.mit.temalab', 'PreemptionUtilityToken', tokenId);
-    await getAssetRegistry('hu.bme.mit.temalab.PreemptionUtilityToken')
-      .then(function(tokenRegistry) {
-      return tokenRegistry.add(token);
+  });
+  await tokenRegistry.updateAll(tx.tokens);
+}
+
+/**
+ * Clear transaction processor function.
+ * @param {hu.bme.mit.temalab.Clear} tx The Clear transaction instance.
+ * @transaction
+ */
+async function clear(tx) {
+  return getAssetRegistry('hu.bme.mit.temalab.PreemptionUtilityToken').then( function(tokenRegistry) {
+    return tokenRegistry.getAll().then( function(tokens) {
+      let tokensToDelete = new Array();
+      tokens.forEach( function(token) {
+        if(!token.isValid && token.latestUpdateTime.getTime() < new Date().getTime() - 60*24*60*60*1000) {
+          tokensToDelete.push(token);
+        }
+      });
+      tokenRegistry.removeAll(tokensToDelete);
     });
-    tx.vehicle.tokens.push(token);
-  }
-  
-  vehicleRegistry.update(tx.vehicle);
+  });
+}
+
+/**
+ * Sign transaction processor function.
+ * @param {hu.bme.mit.temalab.Sign} tx The Sign transaction instance.
+ * @transaction
+ */
+async function sign(tx) {
+  await tx.tokens.forEach( function(token) {
+    token.trafficAuthoritySignature = true;
+  });
+  await getAssetRegistry('hu.bme.mit.temalab.PreemptionUtilityToken').then( function(tokenRegistry) {
+    return tokenRegistry.updateAll(tx.tokens);
+  });
 }

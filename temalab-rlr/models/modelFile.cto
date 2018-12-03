@@ -12,6 +12,7 @@ participant InsuranceCompany identified by insuranceCompanyId {
 
 participant Vehicle identified by vehicleId {
   o String vehicleId
+  --> PreemptionUtilityToken[] tokens
 }
 
 participant Police identified by policeId {
@@ -26,6 +27,10 @@ participant TrafficAuthority identified by trafficAuthorityId {
 
 asset PreemptionUtilityToken identified by tokenId {
   o String tokenId
+  --> Vehicle owner
+  o Boolean isValid default = true
+  o DateTime latestUpdateTime
+  o Boolean trafficAuthoritySignature default = false
 }
 
 /* When a request is taken into account, the Intersection burns the token(s). This destroys the token. */
@@ -39,11 +44,19 @@ transaction Issue {
   --> Vehicle vehicle
   o Integer amount
 }
+  
+/* Sign the token. This allows UnBurn transaction. */
+transaction Sign {
+  --> PreemptionUtilityToken[] tokens
+}
 
-/* Create a given amount of Tokens and add them to a specified Vehicle. This should be available only for TrafficAuthority (in ACL). Serves to compensate wrong burn transactions. Semantically differs from Issue. */
-transaction Compensate {
-  --> Vehicle vehicle
-  o Integer amount
+/* Reactivate invalidated (burned) tokens. Available to InsuranceCompany, but the signature of the TrafficAuthority is needed (on the tokens). */
+transaction UnBurn {
+  --> PreemptionUtilityToken[] tokens
+}
+
+/* Clears all invalid tokens with latestUpdate older than 60 days. This should be available only for TrafficAuthority (in ACL). */
+transaction Clear {
 }
 
 /* /TOKENS */
