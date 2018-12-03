@@ -12,6 +12,7 @@ participant InsuranceCompany identified by insuranceCompanyId {
 
 participant Vehicle identified by vehicleId {
   o String vehicleId
+  --> PreemptionUtilityToken[] tokens
 }
 
 participant Police identified by policeId {
@@ -26,6 +27,23 @@ participant TrafficAuthority identified by trafficAuthorityId {
 
 asset PreemptionUtilityToken identified by tokenId {
   o String tokenId
+  --> Vehicle owner
+  o Boolean isValid default = true
+  o DateTime latestUpdateTime
+  o Boolean trafficAuthoritySignature default = false
+}
+  
+/* Sign the token. This allows UnBurn transaction. */
+transaction Sign {
+  --> PreemptionUtilityToken[] tokens
+}
+  
+ /* Reactivate invalidated (burned) tokens. Available to InsuranceCompany, but the signature of the TrafficAuthority is needed (on the tokens). */
+transaction UnBurn {
+  --> PreemptionUtilityToken[] tokens
+}
+ /* Clears all invalid tokens with latestUpdate older than 60 days. This should be available only for TrafficAuthority (in ACL). */
+transaction Clear {
 }
 
 /* When a request is taken into account, the Intersection burns the token(s). This destroys the token. */
@@ -40,20 +58,18 @@ transaction Issue {
   o Integer amount
 }
 
-/* Create a given amount of Tokens and add them to a specified Vehicle. This should be available only for TrafficAuthority (in ACL). Serves to compensate wrong burn transactions. Semantically differs from Issue. */
-transaction Compensate {
-  --> Vehicle vehicle
-  o Integer amount
-}
+//////////////////////////////////////////////////////////////////
 
-/* /TOKENS */
+
 
 asset RLRevent identified by RLReventId{
   o String RLReventId
   o String lastSignalChangeId
   o String pictureHash
   o String evidence optional
-  o String vehicleId optional
+  -->Vehicle vehicle optional
+  -->SignalChangeEvent sce
+  o String gpsdata optional
   o Boolean invalid
   --> EntryPoint entry
   --> Intersection intersection
@@ -90,17 +106,19 @@ transaction updateEntryPoints {
 
 /*Police can update VehicleID in the RLREvent*/
 transaction updateVehicleID {
-  o String eventId
-  o String vehicleID
+  -->RLRevent event
+  -->Vehicle vehicle
 }
 
 /*Police can invalidate an RLREvent*/
 transaction invalidateRLREvent {
-  o String eventId
+  -->RLRevent event
 }
 
 /*Vehicles(owners) can contest RLREvents*/
 transaction contestRLREvent {
-  o String eventId
-  o String evidence
+  -->RLRevent event
+  o String evidence optional
+  o String gpsdata optional
+  -->SignalChangeEvent sce optional
 }
