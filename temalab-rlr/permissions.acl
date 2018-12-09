@@ -24,11 +24,11 @@ rule NetworkAdminSystem {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-rule IntersectionCanCreateRLRevent {
-    description: "Allow intersections to create RLRevents."
+rule IntersectionCanCreaterlrRecords {
+    description: "Allow intersections to create rlrRecords."
     participant: "hu.bme.mit.temalab.Intersection"
     operation: CREATE
-    resource: "hu.bme.mit.temalab.RLRevent"
+    resource: "hu.bme.mit.temalab.rlrRecord"
     action: ALLOW
 }
 
@@ -72,19 +72,19 @@ rule TrafficAuthorityCanUpdateEntryPointInIntersection {
     action: ALLOW
 }
 
-rule PoliceCanUpdateRLREventVehicle {
-  	description: "Allow Police to update Vehicle ID in RLRevents."
+rule PoliceCanUpdaterlrRecordVehicle {
+  	description: "Allow Police to update Vehicle ID in rlrRecords."
   	participant: "hu.bme.mit.temalab.Police"
     operation: CREATE
     resource: "hu.bme.mit.temalab.updateVehicleID"
     action: ALLOW
 }
 
-rule EverybodyCanReadRLRevent {
-    description: "Allow all participants read access to all RLRevents."
+rule EverybodyCanReadrlrRecord {
+    description: "Allow all participants read access to all rlrRecord."
     participant: "ANY"
     operation: READ
-    resource: "hu.bme.mit.temalab.RLRevent"
+    resource: "hu.bme.mit.temalab.rlrRecord"
     action: ALLOW
 }
 
@@ -148,14 +148,14 @@ rule VehicleCanCreateContestation {
   	description: "Allow Vehciles to create contestation."
     participant: "hu.bme.mit.temalab.Vehicle"
     operation: CREATE
-    resource: "hu.bme.mit.temalab.contestRLREvent"
+    resource: "hu.bme.mit.temalab.contestrlrRecord"
     action: ALLOW
 }
 
-rule PoliceCanInvalidateRLREvent {
-  	description: "Allow Police to invalidate RLRevents."
+rule PoliceCanInvalidaterlrRecord {
+  	description: "Allow Police to invalidate rlrRecords."
   	participant: "hu.bme.mit.temalab.Police"
     operation: CREATE
-    resource: "hu.bme.mit.temalab.invalidateRLREvent"
+    resource: "hu.bme.mit.temalab.invalidaterlrRecord"
     action: ALLOW
 }
