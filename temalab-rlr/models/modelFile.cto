@@ -62,14 +62,14 @@ transaction Issue {
 
 
 
-asset RLRevent identified by RLReventId{
-  o String RLReventId
+asset rlrRecord identified by rlrRecordId{
+  o String rlrRecordId
   o String lastSignalChangeId
   o String pictureHash
   o String evidence optional
   -->Vehicle vehicle optional
   -->SignalChangeEvent sce
-  o String gpsdata optional
+  o String gpsData optional
   o Boolean invalid
   --> EntryPoint entry
   --> Intersection intersection
@@ -79,16 +79,16 @@ abstract asset Preempt {
   --> EntryPoint entryPoint
 }
 
-asset GreenExtensionRequestEvent identified by GreenExtensionRequestEventId extends Preempt {
-	o String GreenExtensionRequestEventId
+asset GreenExtensionRequestEvent identified by greenExtensionRequestEventId extends Preempt {
+	o String greenExtensionRequestEventId
 }
 
-asset PreemptionRequestEvent identified by PreemptionRequestEventId extends Preempt {
-	o String PreemptionRequestEventId
+asset PreemptionRequestEvent identified by preemptionRequestEventId extends Preempt {
+	o String preemptionRequestEventId
 }
 
-asset SignalChangeEvent identified by SignalChangeEventId {
-  o String SignalChangeEventId
+asset SignalChangeEvent identified by signalChangeEventId {
+  o String signalChangeEventId
   --> EntryPoint entryPoint
   --> SignalChangeEvent lastSignalChange
 }
@@ -104,21 +104,21 @@ transaction updateEntryPoints {
 
 }
 
-/*Police can update VehicleID in the RLREvent*/
+/*Police can update VehicleID in the rlrRecord*/
 transaction updateVehicleID {
-  -->RLRevent event
+  -->rlrRecord record
   -->Vehicle vehicle
 }
 
-/*Police can invalidate an RLREvent*/
-transaction invalidateRLREvent {
-  -->RLRevent event
+/*Police can invalidate an rlrRecord*/
+transaction invalidaterlrRecord {
+  -->rlrRecord record
 }
 
-/*Vehicles(owners) can contest RLREvents*/
-transaction contestRLREvent {
-  -->RLRevent event
+/*Vehicles(owners) can contest rlrRecords*/
+transaction contestrlrRecord {
+  -->rlrRecord record
   o String evidence optional
-  o String gpsdata optional
+  o String gpsData optional
   -->SignalChangeEvent sce optional
 }
