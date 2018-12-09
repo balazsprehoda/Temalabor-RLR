@@ -118,6 +118,7 @@ transaction invalidaterlrRecord {
 /*Vehicles(owners) can contest rlrRecords*/
 transaction contestrlrRecord {
   -->rlrRecord record
+  o Boolean deleteEmpty default=false
   o String evidence optional
   o String gpsData optional
   -->SignalChangeEvent sce optional
