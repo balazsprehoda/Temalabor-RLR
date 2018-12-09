@@ -106,21 +106,21 @@ async function updateVehicleID(tx) {
   	// Update the asset with the new value.
   	let vhcl = tx.vehicle;
   	let event = tx.event;
-	  event.vehicle = vhcl;
+	event.vehicle = vhcl;
   
   	// Get the asset registry for the asset.
-    let assetRegistry = await getAssetRegistry('hu.bme.mit.temalab.RLRevent');
+    let assetRegistry = await getAssetRegistry('hu.bme.mit.temalab.rlrRecord');
 
     // Update the asset in the asset registry.
     await assetRegistry.update(event); 	
 }
 
 /**
- * contestRLREvent transaction processor function.
- * @param {hu.bme.mit.temalab.contestRLREvent} tx The sample transaction instance.
+ * contestrlrRecord transaction processor function.
+ * @param {hu.bme.mit.temalab.contestrlrRecord} tx The sample transaction instance.
  * @transaction
  */
-async function contestRLREvent(tx) {
+async function contestrlrRecord(tx) {
   	// Set the vehicle in the event
 	let eventVehicle = tx.event.vehicle;
   
@@ -148,7 +148,7 @@ async function contestRLREvent(tx) {
 
       	
     	// Get the asset registry for the asset.
-    	let assetRegistry = await getAssetRegistry('hu.bme.mit.temalab.RLRevent');
+    	let assetRegistry = await getAssetRegistry('hu.bme.mit.temalab.rlrRecord');
 
    	 	// Update the asset in the asset registry.
     	await assetRegistry.update(tx.event);
@@ -159,8 +159,8 @@ async function contestRLREvent(tx) {
 }
 
 /**
- * invalidateRLREvent transaction processor function.
- * @param {hu.bme.mit.temalab.invalidateRLREvent} tx The sample transaction instance.
+ * invalidaterlrRecord transaction processor function.
+ * @param {hu.bme.mit.temalab.invalidaterlrRecord} tx The sample transaction instance.
  * @transaction
  */
 async function invalidateRLREvent(tx) {
@@ -168,7 +168,7 @@ async function invalidateRLREvent(tx) {
 	tx.event.invalid = true;
   
   	// Get the asset registry for the asset.
-    let assetRegistry = await getAssetRegistry('hu.bme.mit.temalab.RLRevent');
+    let assetRegistry = await getAssetRegistry('hu.bme.mit.temalab.rlrRecord');
 
     // Update the asset in the asset registry.
     await assetRegistry.update(tx.event); 
