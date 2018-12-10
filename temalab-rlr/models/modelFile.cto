@@ -93,7 +93,7 @@ asset SignalChangeEvent identified by signalChangeEventId {
   --> SignalChangeEvent lastSignalChange
 }
 
-abstract concept EntryPoint {
+concept EntryPoint {
   o String entryPointId
   o String streetName
 }
