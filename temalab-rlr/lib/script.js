@@ -239,73 +239,91 @@ async function updateEntryPoints(tx) {
 async function updateVehicleID(tx) {
   	// Update the asset with the new value.
   	let vhcl = tx.vehicle;
-  	let event = tx.event;
-	  event.vehicle = vhcl;
+  	let record = tx.record;
+	record.vehicle = vhcl;
   
   	// Get the asset registry for the asset.
-    let assetRegistry = await getAssetRegistry('hu.bme.mit.temalab.RLRevent');
+    let assetRegistry = await getAssetRegistry('hu.bme.mit.temalab.rlrRecord');
 
     // Update the asset in the asset registry.
-    await assetRegistry.update(event); 	
+    await assetRegistry.update(record); 	
 }
 
 /**
- * contestRLREvent transaction processor function.
- * @param {hu.bme.mit.temalab.contestRLREvent} tx The sample transaction instance.
+ * contestrlrRecord transaction processor function.
+ * @param {hu.bme.mit.temalab.contestrlrRecord} tx The sample transaction instance.
  * @transaction
  */
-async function contestRLREvent(tx) {
-  	// Set the vehicle in the event
-	let eventVehicle = tx.event.vehicle;
+async function contestrlrRecord(tx) {
+    // Set the vehicle in the record
+    let recordVehicle = tx.record.vehicle;
   
-  	// Find who called the transaction
-  	var currentParticipant =await getCurrentParticipant();
-  
-  	// Make sure the participant is the same as the vehicle in the event
-  	if (currentParticipant == eventVehicle) {
-      	if (tx.event.evidence !== null) {
-      		// Update the asset with the new value.
-      		tx.event.evidence = tx.evidence;
-        }
-      
-      	if (tx.event.sce !== null) {
-      		// Update the asset with the new value.
-      		tx.event.sce = tx.sce;
-        }
-      
-      	if (tx.event.gpsdata !== null) {
-      		// Update the asset with the new value.
-      		tx.event.gpsdata = tx.gpsdata;
-        }
-    if (tx.event.gpsdata == null && tx.event.sce == null && tx.event.evidence == null)
-              throw new Error('All fields are empty');
+  	// Set deletion flag (delete fields from evidence if left empty)
+  	let deletionFlag = tx.deleteEmpty;
 
-      	
-    	// Get the asset registry for the asset.
-    	let assetRegistry = await getAssetRegistry('hu.bme.mit.temalab.RLRevent');
+    // Find who called the transaction
+    var currentParticipant = await getCurrentParticipant();
 
-   	 	// Update the asset in the asset registry.
-    	await assetRegistry.update(tx.event);
-    } else {
+    // Make sure the participant is the same as the vehicle in the record
+    if (currentParticipant != recordVehicle)
       // Throw an error as the current participant is not he same
-      throw new Error('Current participant is not eligible for contest');
+      throw new Error('Current participant is not eligible for contest');   
+  	
+  	// Throw an error as there is no information provided
+    if (!deletionFlag) {
+      if (tx.record.gpsData == null && tx.record.sce == null && tx.record.evidence == null)
+        throw new Error('No information is provided');
     }
+
+    if (tx.record.evidence !== null) {
+      
+      // Update the asset with the new value.
+      tx.record.evidence = tx.evidence;
+      
+      //Delete asset if it's left empty
+    } else if (deletionFlag) {
+      	tx.record.evidence = null;
+    }
+
+    if (tx.record.sce !== null) {
+      
+      // Update the asset with the new value.
+      tx.record.sce = tx.sce;
+      //Delete asset if it's left empty
+    } else if (deletionFlag) {
+      	tx.record.sce = null;
+    }
+
+    if (tx.record.gpsdata !== null) {
+      
+      // Update the asset with the new value.
+      tx.record.gpsData = tx.gpsData;
+      //Delete asset if it's left empty
+    } else if (deletionFlag) {
+      	tx.record.gpsData = null;
+    }
+
+    // Get the asset registry for the asset.
+    let assetRegistry = await getAssetRegistry('hu.bme.mit.temalab.rlrRecord');
+
+    // Update the asset in the asset registry.
+    await assetRegistry.update(tx.record);
 }
 
 /**
- * invalidateRLREvent transaction processor function.
- * @param {hu.bme.mit.temalab.invalidateRLREvent} tx The sample transaction instance.
+ * invalidaterlrRecord transaction processor function.
+ * @param {hu.bme.mit.temalab.invalidaterlrRecord} tx The sample transaction instance.
  * @transaction
  */
-async function invalidateRLREvent(tx) {
+async function invalidaterlrRecord(tx) {
   	// Update the asset with the new value.
-	tx.event.invalid = true;
+	tx.record.invalid = true;
   
   	// Get the asset registry for the asset.
-    let assetRegistry = await getAssetRegistry('hu.bme.mit.temalab.RLRevent');
+    let assetRegistry = await getAssetRegistry('hu.bme.mit.temalab.rlrRecord');
 
     // Update the asset in the asset registry.
-    await assetRegistry.update(tx.event); 
+    await assetRegistry.update(tx.record); 
 }
 
 
@@ -323,7 +341,7 @@ async function updateEntryPoints(tx) {
     let assetRegistry = await getParticipantRegistry('hu.bme.mit.temalab.Intersection');
 
     // Update the asset in the asset registry.
-    await assetRegistry.update(tx.event); 
+    await assetRegistry.update(tx.record); 
 }
 
 /**
