@@ -2,7 +2,7 @@ namespace hu.bme.mit.temalab
 
 participant Intersection identified by intersectionId {
   o String intersectionId
-  --> EntryPoint[] entryPoints
+  o EntryPoint[] entryPoints
 }
 
 participant InsuranceCompany identified by insuranceCompanyId {
@@ -71,12 +71,12 @@ asset rlrRecord identified by rlrRecordId{
   -->SignalChangeEvent sce
   o String gpsData optional
   o Boolean invalid
-  --> EntryPoint entry
+  o EntryPoint entry
   --> Intersection intersection
 }
 
 abstract asset Preempt {
-  --> EntryPoint entryPoint
+  o EntryPoint entryPoint
 }
 
 asset GreenExtensionRequestEvent identified by greenExtensionRequestEventId extends Preempt {
@@ -89,18 +89,19 @@ asset PreemptionRequestEvent identified by preemptionRequestEventId extends Pree
 
 asset SignalChangeEvent identified by signalChangeEventId {
   o String signalChangeEventId
-  --> EntryPoint entryPoint
+  o EntryPoint entryPoint
   --> SignalChangeEvent lastSignalChange
 }
 
-asset EntryPoint identified by entryPointId{
+abstract concept EntryPoint {
   o String entryPointId
+  o String streetName
 }
 
 /*TrafficAuthority can update Intersection infrastructure*/
 transaction updateEntryPoints {
   --> Intersection intersection
-  --> EntryPoint[] newPoints			//Replaces old EntryPoint[] array with new instances
+  o EntryPoint[] newPoints			//Replaces old EntryPoint[] array with new instances
 
 }
 
