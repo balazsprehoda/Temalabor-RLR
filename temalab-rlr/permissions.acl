@@ -151,3 +151,44 @@ rule PoliceCanInvalidaterlrRecord {
     resource: "hu.bme.mit.temalab.invalidaterlrRecord"
     action: ALLOW
 }
+
+rule TrafficAuthorityCanIssueTokens {
+    description: "Allow Traffic Authority to issue tokens to a Vehicle."
+    participant: "hu.bme.mit.temalab.TrafficAuthority"
+    operation: CREATE
+    resource: "hu.bme.mit.temalab.Issue"
+    action: ALLOW
+}
+
+rule IntersectionCanBurnTokens {
+ 	description: "Allow intersections to burn tokens."
+    participant: "hu.bme.mit.temalab.Intersection"
+    operation: CREATE
+    resource: "hu.bme.mit.temalab.Burn"
+    action: ALLOW
+}
+
+rule TrafficAuthorityCanClearOldTokens {
+    description: "Allow Traffic Authority to clear old invalid tokens."
+    participant: "hu.bme.mit.temalab.TrafficAuthority"
+    operation: CREATE
+    resource: "hu.bme.mit.temalab.Clear"
+    action: ALLOW
+}
+
+rule InsuranceCompanyCanUnburnTokens {
+    description: "Allow Insurance Company to unburn tokens if they were burned unfairly."
+    participant: "hu.bme.mit.temalab.InsuranceCompany"
+    operation: CREATE
+    resource: "hu.bme.mit.temalab.UnBurn"
+    action: ALLOW
+}
+
+rule TrafficAuthorityCanSignTokens {
+    description: "Allow Traffic Authority to sign tokens."
+    participant: "hu.bme.mit.temalab.TrafficAuthority"
+    operation: CREATE
+    resource: "hu.bme.mit.temalab.Sign"
+    action: ALLOW
+}
+
