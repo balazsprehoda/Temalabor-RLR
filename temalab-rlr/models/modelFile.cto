@@ -36,11 +36,13 @@ asset PreemptionUtilityToken identified by tokenId {
 /* Sign the token. This allows UnBurn transaction. */
 transaction Sign {
   --> PreemptionUtilityToken[] tokens
+  o DateTime dateTime
 }
   
  /* Reactivate invalidated (burned) tokens. Available to InsuranceCompany, but the signature of the TrafficAuthority is needed (on the tokens). */
 transaction UnBurn {
   --> PreemptionUtilityToken[] tokens
+  o DateTime dateTime
 }
  /* Clears all invalid tokens with latestUpdate older than 60 days. This should be available only for TrafficAuthority (in ACL). */
 transaction Clear {
@@ -50,12 +52,14 @@ transaction Clear {
 transaction Burn {
   --> Vehicle vehicle
   --> PreemptionUtilityToken[] tokens
+  o DateTime dateTime
 }
 
 /* Create a given amount of tokens belonging to a Vehicle. This should be available only for TrafficAuthority (in ACL). */
 transaction Issue {
   --> Vehicle vehicle
-  o Integer amount
+  o String[] tokenIds
+  o DateTime dateTime
 }
 
 //////////////////////////////////////////////////////////////////
@@ -102,7 +106,6 @@ concept EntryPoint {
 transaction updateEntryPoints {
   --> Intersection intersection
   o EntryPoint[] newPoints			//Replaces old EntryPoint[] array with new instances
-
 }
 
 /*Police can update VehicleID in the rlrRecord*/
