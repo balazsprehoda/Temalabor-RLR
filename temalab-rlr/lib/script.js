@@ -63,7 +63,6 @@ async function burn(tx) {
           tokenArray.push(tx.tokens[i]);
         }
       }
-    if(!tokenExists) throw "Token with the given ID does not exist!";
     /* Updating the appropriate registries */
     await tokenRegistry.updateAll(tokenArray);
     await vehicleRegistry.update(tx.vehicle);
